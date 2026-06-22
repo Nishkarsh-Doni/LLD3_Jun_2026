@@ -37,6 +37,10 @@ public class Board {
         return cells.get(row).get(col);
     }
 
+    public List<List<Cell>> getCells() {
+        return cells;
+    }
+
     public void printBoard() {
         for (List<Cell> row: cells) {
             for (Cell cell: row) {
