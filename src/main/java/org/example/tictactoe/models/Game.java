@@ -3,9 +3,7 @@ package org.example.tictactoe.models;
 import org.example.tictactoe.exceptions.InvalidGameException;
 import org.example.tictactoe.strategies.winning.WinningStrategy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Game {
     private Board board;
@@ -16,38 +14,7 @@ public class Game {
     private int nextPlayerIndex;
     private List<WinningStrategy> winningStrategies;
 
-    public List<Move> getMoves() {
-        return moves;
-    }
-
-    public void setWinner(Player winner) {
-        this.winner = winner;
-    }
-
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
-    public List<WinningStrategy> getWinningStrategies() {
-        return winningStrategies;
-    }
-
-    public int getNextPlayerIndex() {
-        return nextPlayerIndex;
-    }
-
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public void setNextPlayerIndex(int nextPlayerIndex) {
-        this.nextPlayerIndex = nextPlayerIndex;
-    }
-
+    // Private constructor - only game Builder can create a game object
     private Game(Builder builder) {
         this.board = new Board(builder.boardSize);
         this.players = builder.players;
@@ -55,17 +22,54 @@ public class Game {
         this.winner = null;
         this.gameState = GameState.IN_PROGRESS;
         this.nextPlayerIndex = 0;
+        this.winningStrategies = builder.winningStrategies;
 
         // Randomize the players list
         Collections.shuffle(this.players);
     }
 
+    // Getters
+    public List<WinningStrategy> getWinningStrategies() {
+        return winningStrategies;
+    }
+    public int getNextPlayerIndex() {
+        return nextPlayerIndex;
+    }
+    public List<Player> getPlayers() {
+        return players;
+    }
+    public Player getWinner() {
+        return winner;
+    }
+    public GameState getGameState() {
+        return gameState;
+    }
+    public List<Move> getMoves() {
+        return moves;
+    }
+    public Board getBoard() {
+        return board;
+    }
+
+    // Setters
+    public void setNextPlayerIndex(int nextPlayerIndex) {
+        this.nextPlayerIndex = nextPlayerIndex;
+    }
+    public void setWinner(Player winner) {
+        this.winner = winner;
+    }
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+    // Returns the Builder object
     public static Builder getGameBuilder() {
         return new Builder();
     }
 
-
-    // Builder class
+    // ═══════════════════════════════════════════════
+    //  BUILDER — validates and constructs the Game
+    // ═══════════════════════════════════════════════
     public static class Builder {
         private int boardSize;
         private List<Player> players;
@@ -93,17 +97,30 @@ public class Game {
 
         // validations before creating the game
         private void validate() throws InvalidGameException {
-            // validate the player count
+            // Validate player count: should be boardSize - 1
             if (players.size() != boardSize - 1) {
                 throw new InvalidGameException(
-                        "Player count must be " + (boardSize - 1) + " for a " + boardSize +
-                                "x" + boardSize + " board"
+                        "Player count must be " + (boardSize - 1) + " for a " + boardSize + "x" + boardSize + " board."
                 );
             }
-            // validate unique symbols
 
-            // validate at most one bot player
+            // Validate unique symbols
+            Set<Character> symbols = new HashSet<>();
+            for (Player player : players) {
+                char symbol = player.getSymbol().getCharacter();
+                if (symbols.contains(symbol)) {
+                    throw new InvalidGameException("Duplicate symbol found: " + symbol);
+                }
+                symbols.add(symbol);
+            }
 
+            // Validate at most one bot
+            long botCount = players.stream()
+                    .filter(p -> p.getPlayerType() == PlayerType.BOT)
+                    .count();
+            if (botCount > 1) {
+                throw new InvalidGameException("At most 1 bot is allowed per game.");
+            }
         }
 
         public Game build() throws InvalidGameException {
