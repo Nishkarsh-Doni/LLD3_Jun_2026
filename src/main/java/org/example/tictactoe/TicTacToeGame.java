@@ -18,7 +18,8 @@ public class TicTacToeGame {
         int boardSize = 3;
 
         Player player1 = new HumanPlayer("Shilpa", new Symbol('X'));
-        Player player2 = new HumanPlayer("Deepashree", new Symbol('O'));
+//        Player player2 = new HumanPlayer("Deepashree", new Symbol('O'));
+        Player player2 = new BotPlayer("Chitti", new Symbol('C'), BotDifficultyLevel.EASY);
 
         List<Player> players = new ArrayList<>();
         players.add(player1);
@@ -42,30 +43,38 @@ public class TicTacToeGame {
             controller.printBoard(game);
 
             Player currentPlayer = game.getPlayers().get(game.getNextPlayerIndex());
-            // Alok's turn (X):
             System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol().getCharacter() + "):");
 
-            // Human makes a move via console
-            System.out.println("Enter row and col (e.g., 0 1):");
-            // 0 1
-            String input = scanner.nextLine().trim();
-            String[] parts = input.split("\\s+"); // ['2', '1']
-            int row = Integer.parseInt(parts[0]); // 2
-            int col = Integer.parseInt(parts[1]); // 1
+            Move move;
 
-            if (row < 0 || row >= boardSize || col < 0 || col >= boardSize) {
-                System.out.println("Invalid cell. Please try again in a valid cell");
-                continue;
+            if (currentPlayer.getPlayerType() == PlayerType.BOT) {
+                // Bot makes the move automatically
+                BotPlayer currentbot = (BotPlayer) currentPlayer;
+                move = currentbot.getBotPlayingStrategy().getMove(game.getBoard(), currentbot);
+                System.out.println("Bot plays: (" + move.getCell().getRow() + "," + move.getCell().getCol() + ")");
+            } else {
+                // Human makes a move via console
+                System.out.println("Enter row and col (e.g., 0 1):");
+                // 0 1
+                String input = scanner.nextLine().trim();
+                String[] parts = input.split("\\s+"); // ['2', '1']
+                int row = Integer.parseInt(parts[0]); // 2
+                int col = Integer.parseInt(parts[1]); // 1
+
+                if (row < 0 || row >= boardSize || col < 0 || col >= boardSize) {
+                    System.out.println("Invalid cell. Please try again in a valid cell");
+                    continue;
+                }
+
+                Cell cell = game.getBoard().getCell(row, col);
+
+                if (cell.getCellState() != CellState.EMPTY) {
+                    System.out.println("Cell is already occupied! Try again. \n");
+                    continue;
+                }
+                move = new Move(currentPlayer, cell);
             }
 
-            Cell cell = game.getBoard().getCell(row, col);
-
-            if (cell.getCellState() != CellState.EMPTY) {
-                System.out.println("Cell is already occupied! Try again. \n");
-                continue;
-            }
-
-            Move move = new Move(currentPlayer, cell);
             controller.makeMove(game, move.getCell(), move.getPlayer());
         }
 

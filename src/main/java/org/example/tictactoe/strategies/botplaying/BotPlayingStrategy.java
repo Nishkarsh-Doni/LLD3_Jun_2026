@@ -5,5 +5,5 @@ import org.example.tictactoe.models.Move;
 import org.example.tictactoe.models.Player;
 
 public interface BotPlayingStrategy {
-    Move makeMove(Board board, Player player);
+    Move getMove(Board board, Player player);
 }

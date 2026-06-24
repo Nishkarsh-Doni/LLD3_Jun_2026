@@ -6,8 +6,8 @@ import org.example.tictactoe.models.Player;
 
 public class MediumBotPlayingStrategy implements BotPlayingStrategy{
     @Override
-    public Move makeMove(Board board, Player player) {
+    public Move getMove(Board board, Player player) {
         // TODO:: Implement a smarter strategy (block opponent, prefer center)
-        return new EasyBotPlayingStrategy().makeMove(board, player);
+        return new EasyBotPlayingStrategy().getMove(board, player);
     }
 }

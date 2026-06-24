@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class EasyBotPlayingStrategy implements BotPlayingStrategy{
     @Override
-    public Move makeMove(Board board, Player player) {
+    public Move getMove(Board board, Player player) {
         // Collect all the empty cells
         List<Cell> emptyCells = new ArrayList<>();
         for (var row : board.getCells()) {
